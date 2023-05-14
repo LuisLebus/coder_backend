@@ -1,85 +1,186 @@
-class ProductManager {
-  #products;
+import fs from "fs";
 
-  constructor() {
-    this.#products = [];
+class ProductManager {
+  #path;
+
+  constructor(path) {
+    this.#path = path;
   }
 
-  //It checks if the product code already exists
-  #productCodeExist = (code) => {
-    return this.#products.some((element) => {
+  /******************************************************************
+   * Local function definitions
+   ******************************************************************/
+
+  /**
+   * Check if the product code already exists
+   * @param  {Array}    products  Product list
+   * @param  {Number}   code      Product code
+   *
+   * @return {Boolean}            True if the product code already exists, false otherwise
+   */
+  #productCodeExist = (products, code) => {
+    return products.some((element) => {
       return element.code === code;
     });
   };
 
-  //It checks if the product id already exists
-  #productIdExist = (id) => {
-    return this.#products.some((element) => {
+  /**
+   * Check if the product id already exists
+   * @param  {Array}    products  Product list
+   * @param  {Number}   id        Product id
+   *
+   * @return {Boolean}            True if the product id already exists, false otherwise
+   */
+  #productIdExist = (products, id) => {
+    return products.some((element) => {
       return element.id === id;
     });
   };
 
-  //It generates the next product id
-  #generateNextId = () => {
-    if (this.#products.length > 0) {
-      return this.#products[this.#products.length - 1].id + 1;
+  /**
+   * Generate the next product id
+   * @param  {Array}    products  Product list
+   *
+   * @return {Number}             Next product id
+   */
+  #generateNextId = (products) => {
+    if (products.length > 0) {
+      return products[products.length - 1].id + 1;
     } else {
       return 0;
     }
   };
 
-  //It adds one product
-  addProduct = (title, description, price, thumbnail, code, stock) => {
-    if (!title || !description || !price || !thumbnail || !code || !stock) {
-      console.log("Error: Invalid parameters");
-    } else {
-      if (!this.#productCodeExist(code)) {
-        const product = {
-          title,
-          description,
-          price,
-          thumbnail,
-          code,
-          stock,
-          id: this.#generateNextId(),
-        };
-        this.#products.push(product);
+  /******************************************************************
+   * Public function definitions
+   ******************************************************************/
+
+  /**
+   * Add one product
+   * @param  {Object}   product   Product to add
+   * @param  {Function} callback  Callback to report any error
+   */
+  addProduct = async (product, callback) => {
+    try {
+      if (!product) {
+        throw new Error("Invalid product");
       } else {
-        console.log("Error: Product code duplicated");
+        const products = JSON.parse(await fs.promises.readFile(this.#path, { encoding: "utf-8" }));
+
+        if (this.#productCodeExist(products, product.code)) {
+          throw new Error("Product code duplicated");
+        } else {
+          const newProduct = { ...product, id: this.#generateNextId(products) };
+
+          products.push(newProduct);
+
+          await fs.promises.writeFile(this.#path, JSON.stringify(products));
+        }
       }
+    } catch (error) {
+      callback(error);
     }
   };
 
-  //It returns one product by id
-  getProductById = (id) => {
-    if (this.#productIdExist(id)) {
-      return this.#products.find((element) => {
-        return element.id === id;
-      });
-    } else {
-      console.log("Not found");
-      return null;
+  /**
+   * Return one product by id
+   * @param  {Number} id          Product id
+   * @param  {Function} callback  Callback to report any error
+   *
+   * @return {Object}             Product, or undefined in case of error
+   */
+  getProductById = async (id, callback) => {
+    try {
+      const products = JSON.parse(await fs.promises.readFile(this.#path, { encoding: "utf-8" }));
+
+      if (!this.#productIdExist(products, id)) {
+        throw new Error("Not found");
+      } else {
+        return products.find((element) => {
+          return element.id === id;
+        });
+      }
+    } catch (error) {
+      callback(error);
     }
   };
 
-  //It returns all the products
-  getProducts = () => {
-    return this.#products;
+  /**
+   * Return all the products
+   * @param  {Function} callback  Callback to report any error
+   *
+   * @return {Object}             Product list, or undefined in case of error
+   */
+  getProducts = async (callback) => {
+    try {
+      return JSON.parse(await fs.promises.readFile(this.#path, { encoding: "utf-8" }));
+    } catch (error) {
+      callback(error);
+    }
+  };
+
+  /**
+   * Delete one product
+   * @param  {Number}   id          Product id
+   * @param  {Function} callback    Callback to report any error
+   */
+  deleteProduct = async (id, callback) => {
+    try {
+      const products = JSON.parse(await fs.promises.readFile(this.#path, { encoding: "utf-8" }));
+
+      if (!this.#productIdExist(products, id)) {
+        throw new Error("Not found");
+      } else {
+        const newProducts = products.filter((element) => {
+          return element.id !== id;
+        });
+
+        await fs.promises.writeFile(this.#path, JSON.stringify(newProducts));
+      }
+    } catch (error) {
+      callback(error);
+    }
+  };
+
+  /**
+   * Update one product
+   * @param  {Object}   product   Product to update
+   * @param  {Number}   id        Product id
+   * @param  {Function} callback  Callback to report any error
+   */
+  updateProduct = async (product, id, callback) => {
+    try {
+      const products = JSON.parse(await fs.promises.readFile(this.#path, { encoding: "utf-8" }));
+
+      if (!this.#productIdExist(products, id)) {
+        throw new Error("Not found");
+      } else if (this.#productCodeExist(products, product.code)) {
+        throw new Error("Product code duplicated");
+      } else {
+        const index = products.findIndex((element) => {
+          return element.id === id;
+        });
+        const newProduct = { ...product, id: products[index].id };
+        products[index] = newProduct;
+
+        await fs.promises.writeFile(this.#path, JSON.stringify(products));
+      }
+    } catch (error) {
+      callback(error);
+    }
   };
 }
 
-//
-//Testing
-//
-const productManager = new ProductManager();
+/**
+ * Example
+ *
 
-console.log(productManager.getProducts());
+const productManager = new ProductManager("products.json");
 
-productManager.addProduct("producto prueba", "Este es un producto prueba", 200, "Sin imagen", "abc123", 25);
+const products = await productManager.getProducts((error) => {
+  console.log(error.message);
+});
 
-console.log(productManager.getProducts());
+console.log(products);
 
-productManager.addProduct("producto prueba", "Este es un producto prueba", 200, "Sin imagen", "abc123", 25); //It generates an error since code=abc123 already exists
-
-console.log(productManager.getProductById(0)); //It returns the product
-console.log(productManager.getProductById(5)); //It returns null since id=5 does not exist
+*/
