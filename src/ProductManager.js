@@ -58,9 +58,8 @@ class ProductManager {
   /**
    * Add one product
    * @param  {Object}   product   Product to add
-   * @param  {Function} callback  Callback to report any error
    */
-  addProduct = async (product, callback) => {
+  addProduct = async (product) => {
     try {
       if (!product) {
         throw new Error("Invalid product");
@@ -78,18 +77,17 @@ class ProductManager {
         }
       }
     } catch (error) {
-      callback(error);
+      console.log(error.message);
     }
   };
 
   /**
    * Return one product by id
    * @param  {Number} id          Product id
-   * @param  {Function} callback  Callback to report any error
    *
    * @return {Object}             Product, or undefined in case of error
    */
-  getProductById = async (id, callback) => {
+  getProductById = async (id) => {
     try {
       const products = JSON.parse(await fs.promises.readFile(this.#path, { encoding: "utf-8" }));
 
@@ -101,30 +99,28 @@ class ProductManager {
         });
       }
     } catch (error) {
-      callback(error);
+      console.log(error.message);
     }
   };
 
   /**
    * Return all the products
-   * @param  {Function} callback  Callback to report any error
    *
-   * @return {Object}             Product list, or undefined in case of error
+   * @return {Array}            Product list, or undefined in case of error
    */
-  getProducts = async (callback) => {
+  getProducts = async () => {
     try {
       return JSON.parse(await fs.promises.readFile(this.#path, { encoding: "utf-8" }));
     } catch (error) {
-      callback(error);
+      console.log(error.message);
     }
   };
 
   /**
    * Delete one product
    * @param  {Number}   id          Product id
-   * @param  {Function} callback    Callback to report any error
    */
-  deleteProduct = async (id, callback) => {
+  deleteProduct = async (id) => {
     try {
       const products = JSON.parse(await fs.promises.readFile(this.#path, { encoding: "utf-8" }));
 
@@ -138,7 +134,7 @@ class ProductManager {
         await fs.promises.writeFile(this.#path, JSON.stringify(newProducts));
       }
     } catch (error) {
-      callback(error);
+      console.log(error.message);
     }
   };
 
@@ -146,9 +142,8 @@ class ProductManager {
    * Update one product
    * @param  {Object}   product   Product to update
    * @param  {Number}   id        Product id
-   * @param  {Function} callback  Callback to report any error
    */
-  updateProduct = async (product, id, callback) => {
+  updateProduct = async (product, id) => {
     try {
       const products = JSON.parse(await fs.promises.readFile(this.#path, { encoding: "utf-8" }));
 
@@ -166,21 +161,9 @@ class ProductManager {
         await fs.promises.writeFile(this.#path, JSON.stringify(products));
       }
     } catch (error) {
-      callback(error);
+      console.log(error.message);
     }
   };
 }
 
-/**
- * Example
- *
-
-const productManager = new ProductManager("products.json");
-
-const products = await productManager.getProducts((error) => {
-  console.log(error.message);
-});
-
-console.log(products);
-
-*/
+export default ProductManager;
