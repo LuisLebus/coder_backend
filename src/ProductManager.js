@@ -58,6 +58,8 @@ class ProductManager {
   /**
    * Add one product
    * @param  {Object}   product   Product to add
+   *
+   * @return {Boolean}            False if an error occurred, true otherwise
    */
   addProduct = async (product) => {
     try {
@@ -67,17 +69,18 @@ class ProductManager {
         const products = JSON.parse(await fs.promises.readFile(this.#path, { encoding: "utf-8" }));
 
         if (this.#productCodeExist(products, product.code)) {
-          throw new Error("Product code duplicated");
+          throw new Error(`Product code: ${product.code} duplicated`);
         } else {
-          const newProduct = { ...product, id: this.#generateNextId(products) };
-
-          products.push(newProduct);
+          products.push({ ...product, id: this.#generateNextId(products) });
 
           await fs.promises.writeFile(this.#path, JSON.stringify(products));
+
+          return true;
         }
       }
     } catch (error) {
       console.log(error.message);
+      return false;
     }
   };
 
@@ -92,14 +95,15 @@ class ProductManager {
       const products = JSON.parse(await fs.promises.readFile(this.#path, { encoding: "utf-8" }));
 
       if (!this.#productIdExist(products, id)) {
-        throw new Error("Not found");
+        throw new Error(`Product id: ${id} not found`);
       } else {
         return products.find((element) => {
           return element.id === id;
         });
       }
     } catch (error) {
-      console.log(error.message);
+      console.error(error.message);
+      return false;
     }
   };
 
@@ -113,28 +117,34 @@ class ProductManager {
       return JSON.parse(await fs.promises.readFile(this.#path, { encoding: "utf-8" }));
     } catch (error) {
       console.log(error.message);
+      return false;
     }
   };
 
   /**
    * Delete one product
-   * @param  {Number}   id          Product id
+   * @param  {Number}   id        Product id
+   *
+   * @return {Boolean}            False if an error occurred, true otherwise
    */
   deleteProduct = async (id) => {
     try {
       const products = JSON.parse(await fs.promises.readFile(this.#path, { encoding: "utf-8" }));
 
       if (!this.#productIdExist(products, id)) {
-        throw new Error("Not found");
+        throw new Error(`Product id: ${id} not found`);
       } else {
         const newProducts = products.filter((element) => {
           return element.id !== id;
         });
 
         await fs.promises.writeFile(this.#path, JSON.stringify(newProducts));
+
+        return true;
       }
     } catch (error) {
       console.log(error.message);
+      return false;
     }
   };
 
@@ -142,26 +152,31 @@ class ProductManager {
    * Update one product
    * @param  {Object}   product   Product to update
    * @param  {Number}   id        Product id
+   *
+   * @return {Boolean}            False if an error occurred, true otherwise
    */
   updateProduct = async (product, id) => {
     try {
       const products = JSON.parse(await fs.promises.readFile(this.#path, { encoding: "utf-8" }));
 
       if (!this.#productIdExist(products, id)) {
-        throw new Error("Not found");
+        throw new Error(`Product id: ${id} not found`);
       } else if (this.#productCodeExist(products, product.code)) {
-        throw new Error("Product code duplicated");
+        throw new Error(`Product code: ${product.code} duplicated`);
       } else {
         const index = products.findIndex((element) => {
           return element.id === id;
         });
-        const newProduct = { ...product, id: products[index].id };
-        products[index] = newProduct;
+
+        products[index] = { ...products[index], ...product, id: products[index].id };
 
         await fs.promises.writeFile(this.#path, JSON.stringify(products));
+
+        return true;
       }
     } catch (error) {
       console.log(error.message);
+      return false;
     }
   };
 }

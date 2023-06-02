@@ -1,34 +1,24 @@
 import express from "express";
-import ProductManager from "./ProductManager.js";
+import productRouter from "./routers/product.routes.js";
 
-const productManager = new ProductManager("./db/products.json");
+/******************************************************************
+ * Constants
+ ******************************************************************/
+const SERVER_PORT = 8080;
+const PRODUCTS_PATH = "/api/products/";
 
 const app = express();
 
-app.get("/products", async (req, res) => {
-  const limit = Number(req.query.limit);
+/******************************************************************
+ * Middlewares
+ ******************************************************************/
+app.use(express.json());
 
-  const products = await productManager.getProducts();
+/******************************************************************
+ * Routers
+ ******************************************************************/
+app.use(PRODUCTS_PATH, productRouter);
 
-  if (limit) {
-    res.send(products.slice(0, limit));
-  } else {
-    res.send(products);
-  }
-});
-
-app.get("/products/:id", async (req, res) => {
-  const id = Number(req.params.id);
-
-  const product = await productManager.getProductById(id);
-
-  if (product) {
-    res.send(product);
-  } else {
-    res.send({ error: "Not found" });
-  }
-});
-
-app.listen(8080, () => {
-  console.log("Server ready on port 8080.");
+app.listen(SERVER_PORT, () => {
+  console.log(`Server ready on port ${SERVER_PORT}.`);
 });
