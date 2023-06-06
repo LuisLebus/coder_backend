@@ -73,7 +73,7 @@ class ProductManager {
         } else {
           products.push({ ...product, id: this.#generateNextId(products) });
 
-          await fs.promises.writeFile(this.#path, JSON.stringify(products));
+          await fs.promises.writeFile(this.#path, JSON.stringify(products, null, 2));
 
           return true;
         }
@@ -138,7 +138,7 @@ class ProductManager {
           return element.id !== id;
         });
 
-        await fs.promises.writeFile(this.#path, JSON.stringify(newProducts));
+        await fs.promises.writeFile(this.#path, JSON.stringify(newProducts, null, 2));
 
         return true;
       }
@@ -170,7 +170,7 @@ class ProductManager {
 
         products[index] = { ...products[index], ...product, id: products[index].id };
 
-        await fs.promises.writeFile(this.#path, JSON.stringify(products));
+        await fs.promises.writeFile(this.#path, JSON.stringify(products, null, 2));
 
         return true;
       }
