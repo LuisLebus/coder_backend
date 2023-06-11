@@ -77,11 +77,11 @@
     "status": true
   },
   {
-    "title": "Producto 107",
-    "description": "Descripción del producto 107",
+    "title": "Producto 07",
+    "description": "Descripción del producto 07",
     "price": 1122,
     "thumbnail": [],
-    "code": "prod-10aaas1",
+    "code": "prod-07",
     "stock": 1567,
     "status": true,
     "category": "none",

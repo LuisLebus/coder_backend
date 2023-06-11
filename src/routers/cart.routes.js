@@ -1,8 +1,11 @@
 import { Router } from "express";
+import path from "path";
+
 import CartManager from "../CartManager.js";
+import __rootpath from "../rootpath.js";
 
 const router = Router();
-const cartManager = new CartManager("./db/carts.json");
+const cartManager = new CartManager(path.join(__rootpath, "db", "carts.json"));
 
 router.post("/", (req, res) => {
   const result = cartManager.createCart();
@@ -28,9 +31,6 @@ router.get("/:cid", async (req, res) => {
 router.post("/:cid/product/:pid", (req, res) => {
   const cid = Number(req.params.cid);
   const pid = Number(req.params.pid);
-
-  console.log(cid);
-  console.log(pid);
 
   const result = cartManager.addProductToCart(cid, pid);
 
