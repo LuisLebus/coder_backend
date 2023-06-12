@@ -1,0 +1,11 @@
+<div class="mainDiv">
+    {{#each products}}
+        <div class="productDiv">
+            <h3>{{this.title}}</h3>
+            <p>{{this.description}}</p>
+            <h2>${{this.price}}</h2>
+            <h5>Disponible: {{this.stock}}</h5>
+            <button class="btnDetail" id="idBtnDetail">VER</button>
+        </div>
+    {{/each}}
+</div>
