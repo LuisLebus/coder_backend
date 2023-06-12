@@ -3,6 +3,7 @@ import handlebars from "express-handlebars";
 import path from "path";
 
 import __rootpath from "./rootpath.js";
+import startSocketServer from "./socket/socket.js";
 import productRouter from "./routers/product.routes.js";
 import cartRouter from "./routers/cart.routes.js";
 import viewRouter from "./routers/views.routes.js";
@@ -37,6 +38,11 @@ app.use(PRODUCTS_PATH, productRouter);
 app.use(CARTS_PATH, cartRouter);
 app.use(VIEWS_PATH, viewRouter);
 
-app.listen(SERVER_PORT, () => {
+const httpServer = app.listen(SERVER_PORT, () => {
   console.log(`Server ready on port ${SERVER_PORT}.`);
 });
+
+/******************************************************************
+ * Socket server - socket.io
+ ******************************************************************/
+startSocketServer(httpServer);

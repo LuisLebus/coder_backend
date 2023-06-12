@@ -4,8 +4,7 @@
     box-sizing: border-box;
 }
 
-.main_div {
-    /* background-color: aqua; */
+.mainDiv {
     padding: 1rem;
     display: flex;
     flex-wrap: wrap;
@@ -15,24 +14,33 @@
     gap: 1.5rem;
 }
 
-.product_div {
+.productDiv {
     min-width: 25%;
     padding: 1rem;
-
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     gap: 1rem;
-
     border: 1px solid #000;
     box-shadow: 2px 2px 5px black;
-
     text-align: center;
-
 }
 
-
-.btn_ver{
+.btnDetail, 
+.btnDelete,
+.btnAdd {
     padding: 0.5rem 2rem;
+}
+
+.formDiv {
+    margin: auto;
+    width: 50%;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    gap: 1rem;
 }

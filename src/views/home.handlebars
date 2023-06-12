@@ -1,12 +1,11 @@
-<div class="main_div">
+<div class="mainDiv">
     {{#each products}}
-        <div class="product_div">
+        <div class="productDiv">
             <h3>{{this.title}}</h3>
             <p>{{this.description}}</p>
             <h2>${{this.price}}</h2>
             <h5>Disponible: {{this.stock}}</h5>
-            <button class="btn_ver" id="id_btn_ver">VER</button>
+            <button class="btnDetail" id="idBtnDetail">VER</button>
         </div>
     {{/each}}
-    <br>
 </div>
